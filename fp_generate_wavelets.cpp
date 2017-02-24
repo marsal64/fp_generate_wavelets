@@ -5,6 +5,8 @@
 // Description : Fingerprints processing - wavelets generation from patterns
 //==========================================================================
 
+// compile with -std=c++11
+
 /*
  standalone program version to be run using e.g.:
  ./fp_generate_wavelets < datalog.csv
@@ -63,8 +65,7 @@ int main(int argc, char* argv[]) {
 
 	// variables for waveletes generation
 	std::vector<double> seqdata;
-
-	int n;
+	int n, namend;
 	double* d;
 	double* v; 	// wavelets results
 	double* w; 	// wavelets inverse results (helper)
@@ -140,15 +141,39 @@ int main(int argc, char* argv[]) {
 					// cut vector to n and copy to array d
 					//seqdata.resize(n);
 					d = &seqdata[0];
-					n = seqdata.size();
-					v = daub4_transform(n, d);
-					w = daub4_transform_inverse(n, v);
 
-					for (int i = 0; i < n; i++) {
-								std::cout << "  " << std::setw(2) << i << "  " << std::setw(10) << d[i]
+					// find appropriate n - nearest biggest power of 2
+					n = seqdata.size();
+
+					//debug
+					// std::cout << "(debug) original n: " << n << std::endl;
+					// std::cout << "(debug) log2(n): " << log2(n) << std::endl;
+
+					namend = pow(2.0,trunc(log2(n))+1);
+
+					// debug
+					// std::cout << "(debug) amended n: " << n << std::endl;
+
+					v = daub4_transform(namend, d);
+					w = daub4_transform_inverse(namend, v);
+
+					// output original size only
+
+					// debug
+					for (int i = 0; i < n - 2; i++) {
+								std::cout << "(debug)  " << std::setw(2) << i << "  " << std::setw(10) << d[i]
 										<< "  " << std::setw(10) << v[i] << "  " << std::setw(10)
 										<< w[i] << "\n";
 					}
+
+					// output to file
+					std::ofstream outputfile;
+					outputfile.open ("wavelet_"+std::to_string(processpatid)+".txt");
+					for (int i = 0; i < n - 2; i++) {
+						outputfile << v[i] << std::endl;
+					}
+
+					outputfile.close();
 
 					// cleanse seqdata for future use
 					processpatid = 0;
