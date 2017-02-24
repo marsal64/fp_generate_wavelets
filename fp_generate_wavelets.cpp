@@ -142,7 +142,7 @@ int main(int argc, char* argv[]) {
 					//seqdata.resize(n);
 					d = &seqdata[0];
 
-					// find appropriate n - nearest biggest power of 2
+					// find appropriate n (nearest bigger power of 2)
 					n = seqdata.size();
 
 					//debug
